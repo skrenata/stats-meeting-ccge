@@ -1,0 +1,143 @@
+---
+title: "My second Rmd document"
+author: "Author: Myself"
+date: "Last update: `r format(Sys.time(), '%d %b %Y')`"
+output: 
+    html_document:
+        toc: true
+        toc_depth: 2
+        toc_float: true
+        number_sections: true
+        theme: default
+        highlight: tango
+---
+
+```{r setup_chunk, echo=FALSE, message=FALSE}
+	## load any packages you'll need in the document
+	library(knitr)
+	library(ggplot2)
+	library(kableExtra)
+	
+	## here you can also load any custom-written functions you may need
+	## source("~/Documents/R_scripts/my_custom_functions.R")
+	
+	## define global options for R code chunks
+	opts_chunk$set(echo = FALSE, ## don't output the contents of the chunk
+					message = FALSE, ## don't display R messages
+					warning = FALSE, ## don't display R warnings
+					fig.width=5, ## define standard figure widthd
+					fig.height=5, ## define standard figure height
+					fig.align = "center") ## define standard figure alignment
+	## these can be changed in individual chunks if required (the options in
+	## individual chunks will overwrite these), but if none are specified the 
+	## chunks will default to these.
+	
+	## define colourblind palette for ggplot
+	cbPalette <- c("#999999", "#CC79A7", "#b2182b", "#67001f", "#D55E00", "#E69F00", 
+				   "#F0E442", "#7fbc41", "#009E73", "#56B4E9", "#0072B2", "#542788")
+
+	## define custom ggplot theme
+	custhm <- theme(axis.title.x = element_text(color="black", size=rel(1.5)),
+					axis.text.x  = element_text(color="black", size=rel(1.5), 
+												margin=margin(t = 10, b = 10)),
+					axis.title.y = element_text(color="black", size=rel(1.5)),
+					axis.text.y  = element_text(color="black", size=rel(1.5), 
+												margin=margin(l = 10, r = 10)),
+					legend.text = element_text(color="black", size=rel(1.2)),
+					legend.position = "top",
+					plot.title = element_text(size=rel(1.7), hjust=0.5, 
+											  face="plain"),
+					plot.subtitle = element_text(size=rel(1.1), 
+												 hjust=0.5, face="plain"))
+```
+
+<!-- start of the document -->
+<!-- comments in html are written like this :) -->
+
+_This is a sample .Rmd file, which will investigate the built-in R dataset 
+containing the average monthly temperatures in Nottingham (in Farenheights)._
+
+
+# The dataset {.tabset .tabset-pills}
+
+This is a random built-in dataset from R, I didn't even know it existed. 
+It has average monthly temperatures between 1920 and 1939.
+
+## A sneak peek into the dataset
+```{r, echo=TRUE}
+	typeof(nottem)
+	nottem
+```
+
+## A better look using kable
+```{r}
+	nottemFrame <- cbind(c(1920:1939),
+						 matrix(nottem, ncol=12, byrow=TRUE))
+
+	auxheader <- 13
+	names(auxheader) <- "Average monthly temperature"
+
+	kable(nottemFrame, format="html", booktabs=TRUE, row.names=FALSE,
+		  col.names=c(" ", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", 
+		  			"Aug", "Sep", "Oct", "Nov", "Dec")) %>%
+		kable_styling(full_width=FALSE, bootstrap_options=c("striped")) %>%
+		column_spec(1, bold=TRUE, border_right=TRUE, color="blue") %>%
+		row_spec(0, bold=TRUE, color="blue") %>%
+		add_header_above(auxheader)
+		
+```
+
+# Some plots {.tabset .tabset-pills}
+
+```{r}
+	## total number of years of observations
+	nYears <- dim(nottemFrame)[1]
+ 	## prepare data.frame which will be used for plotting
+	plotFrame <- matrix(0,12*nYears,3)
+	## first column: nottemFrame as a single column vector, with removed $Years column
+	## (this is equivalent to Jan 1920, Jan 1921, ..., Jan1939, Feb 1920, ..., Dec 1939
+	## because I was too lazy to put it into chronological order - ggplot will be fine)
+	plotFrame[,1] <- as.vector(nottemFrame[,-1])
+	## second column: years 1920-1939
+	plotFrame[,2] <- rep(1920:1939,12)
+	## third column: months 1-12
+	plotFrame[,3] <- as.vector(sapply(X=1:12,FUN=function(x){rep(x,nYears)}))
+	## convert to data.frame() object, and name columns
+	plotFrame <- data.frame(plotFrame)
+	names(plotFrame) <- c("Temperature", "Year","Month")
+		
+	## create ggplot object
+	myPlot <- ggplot(plotFrame) 
+```
+
+## A boxplot
+
+```{r boxplot_example}
+	myPlot +
+		geom_boxplot(aes(x=as.factor(Month), y=Temperature)) +
+		labs(x="Month", y="Average temperature (F)", title="Temperature in Nottingham")
+```
+This was trickier than I expected. Since the `plotFrame` dataset is all numeric,
+if we simply call `geom_boxplot()` and ask for months on the x axis, it thinks 
+that the scale is continuous. So it was necessary to convert `x=as.factor(Month)`
+in the `aes()` plot call in order to get the desired results.
+
+
+## A barplot
+
+```{r barplot_example}
+	myPlot +
+		geom_col(aes(x=as.factor(Month), y=Temperature, fill=as.factor(Year))) +
+		labs(x="Month", y="", title="Temperature in Nottingham") +
+		guides(fill = guide_legend(title = "Year"))
+```
+
+## A histogram
+```{r histogram_example}
+	myPlot +
+		geom_histogram(aes(x=Temperature, fill=as.factor(Month)), bins=25) +
+		labs(x="Average monthly temperature", y="Frequency") +
+		scale_fill_manual(values=cbPalette) +
+		guides(fill = guide_legend(title = "Month"))
+		
+```
