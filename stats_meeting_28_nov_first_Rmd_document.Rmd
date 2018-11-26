@@ -1,0 +1,71 @@
+---
+title: "My first Rmd document"
+author: "My name"
+date: "Last update: `r format(Sys.time(), '%d %b %Y')`"
+output: 
+    html_document:
+        toc: true
+        toc_depth: 2
+        number_sections: true
+        theme: united
+        highlight: tango
+---
+
+After the header, you can just imput normal(ish) text.
+
+- We can make lists by using hyphens
++ then four spaces to add subitems
++ like these
+
+It's possible to make the font _italic_ or **bold** as well.
+
+To change text colour inline, <span style="color:purple"> we need to use the HTML tag "span" </span>.
+
+# It's easy to add section headers
+
+## And subheaders as well {.tabset .tabset-pills}
+
+### We can also make tabs
+
+**With something different in each tab**
+
+### I'm another tab
+
+_And this is my text!_
+
+## But that's not all! {.tabset .tabset-pills}
+
+The really cool thing about Rmarkdown are code chunks. You are probably going to be writing those in R, but it is possible to use other languages as well. Code chunks let you embed the definition of figures / tables into your document, so if anything changes all you have to do is to `knit` it again, and all data will be updated.
+
+Note that you can also add inline code. For example, this is a random number between 0 and 100: `r runif(1,0,100)`. And, if you had previously defined objects, in R, you can refer to them, too.
+
+### A simple plot
+
+```{r, echo=FALSE}
+A <- rnorm(100,0,1)
+B <- rnorm(100,0,1)
+C <- rnorm(100,0,1)
+plot(A,B)
+```
+
+### A ggplot example {.tabset .tabset-pills}
+
+#### Single layer
+```{r, echo=FALSE}
+	library(ggplot2)
+	## uses the same A and B defined in previous chunk - unless you explicitly 
+	## remove variables, they will exist within the Rmd document
+	plotFrame <- data.frame(A,B,C)
+	ggplot(plotFrame, aes(x = A, y = B, color = A > 0)) + geom_point()
+```
+
+#### More layers
+```{r, echo=FALSE}
+	## uses the same plotFrame defined in the previous chunk
+	## colours points in a gradient according to the values of C
+	## linedraw theme for white background with lines
+	## see more pre-defined themes here: http://www.sthda.com/english/wiki/ggplot2-themes-and-background-colors-the-3-elements
+	ggplot(plotFrame) +
+		geom_point(aes(x = A, y = B, color = C)) +
+		theme_linedraw()
+```
