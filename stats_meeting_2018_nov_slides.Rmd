@@ -1,0 +1,393 @@
+---
+title: "Rmarkdown (and other things)"
+author: rk595@cam.ac.uk
+date: "Stats Meeting 26th Nov 2018"
+fontsize: 15pt
+output: 
+    beamer_presentation:
+        highlight: tango
+        theme: "Boadilla"
+        colortheme: "whale"
+        fonttheme: "professionalfonts"
+        slide_level: 2
+        keep_tex: true
+        toc: true
+header-includes:
+    \usepackage{booktabs}
+    \definecolor{lightseagreen}{rgb}{0.15, 0.7, 0.65}
+    \usecolortheme[named=lightseagreen]{structure}
+    \hypersetup{colorlinks, urlcolor=lightseagreen, linkcolor=}
+    \def\R{\includegraphics[width=0.04\textwidth]{./R_logo.png}}
+    \def\begincols{\begin{columns}}
+    \def\begincol{\begin{column}}
+    \def\endcol{\end{column}}
+    \def\endcols{\end{columns}}
+---
+
+```{r setup, echo=FALSE}
+    library(ggplot2)
+    library(kableExtra)
+```
+
+# Package 'ggplot'
+
+## Package 'ggplot'
+
+- Plot graphics in R
+
+- More complicated than standard R graphics for simple plots...
+
+- ... but easier for complex graphics / custom formatting.
+
+- Plot formed of overlapping layers
+
+- \alert{Requires a data.frame object}
+
+## Example
+\begin{figure}
+	\includegraphics[height=0.8\textheight]{./irises.jpeg}
+\end{figure}
+
+## Example
+
+### The Iris dataset
+\footnotesize
+```{r, echo=FALSE, eval=TRUE} 
+head(iris, n=15)
+```
+
+## Example 
+\footnotesize
+\begincols
+    \begincol{0.38\textwidth}
+        \texttt{ggplot(iris)}
+    \endcol
+    \begincol{0.01\textwidth}
+    \endcol
+    \begincol{0.6\textwidth}
+    ```{r, eval=TRUE, echo=FALSE}
+        ggplot(iris)
+    ``` 
+    \endcol
+\endcols
+
+## Example 
+\footnotesize
+\begincols
+    \begincol{0.38\textwidth}
+        ```
+        ggplot(iris) + geom_point(aes(x=Sepal.Length, y=Petal.Length)
+        ```
+    \endcol
+    \begincol{0.01\textwidth}
+    \endcol
+    \begincol{0.6\textwidth}
+    ```{r, eval=TRUE, echo=FALSE}
+        ggplot(iris) +
+        geom_point(aes(x=Sepal.Length, y=Petal.Length))
+    ``` 
+    \endcol
+\endcols
+
+## Example 
+\footnotesize
+\begincols
+    \begincol{0.38\textwidth}
+    ```
+        ggplot(iris) +
+        geom_point(aes(x=Sepal.Length, y=Petal.Length, col=Species), size=6) +
+        geom_histogram(aes(x=Sepal.Length, y=..count.., alpha=0.5), bins = 20)
+    ```
+    \endcol
+    \begincol{0.01\textwidth}
+    \endcol
+    \begincol{0.6\textwidth}
+    ```{r, eval=TRUE, echo=FALSE}
+        ggplot(iris) +
+        geom_point(aes(x=Sepal.Length, y=Petal.Length, col=Species), size=6) +
+        geom_histogram(aes(x=Sepal.Length, y=..count.., alpha=0.5), bins = 20)
+    ``` 
+    \endcol
+\endcols
+
+## Example 
+\footnotesize
+\begincols
+    \begincol{0.38\textwidth}
+    ```
+    ggplot(iris) + geom_point(aes(x=Sepal.Length, y=Petal.Length, col=Species), size=6) + labs(x="Sepal length (cm)", y="Petal length (cm)", title="Iris flowers")
+    ```
+    \endcol
+    \begincol{0.01\textwidth}
+    \endcol
+    \begincol{0.6\textwidth}
+    ```{r, eval=TRUE, echo=FALSE}
+        ggplot(iris) +
+        geom_point(aes(x=Sepal.Length, y=Petal.Length, col=Species), size=6) +
+        labs(x="Sepal length (cm)", y="Petal length (cm)", title="Iris flowers")
+    ``` 
+    \endcol
+\endcols
+
+## Example
+\footnotesize
+\begincols
+    \begincol{0.38\textwidth}
+        ```
+        ggplot(iris) + geom_point(aes(x=Sepal.Length, y=Petal.Length, col=Species), size=6) +  labs(x="Sepal length (cm)", y="Petal length (cm)", title="Iris flowers") + theme(plot.title=element_text(size=50), axis.title.x=element_text(size=40, vjust=-1), axis.title.y=element_text(size=40, vjust=1), axis.text.x=element_text(size=30), axis.text.y=element_text(size=30), legend.title=element_blank(), legend.position = "top", legend.text=element_text(size=30), plot.margin = unit(c(1,1,1,1), "cm"))
+        ```
+    \endcol
+    \begincol{0.01\textwidth}
+    \endcol
+    \begincol{0.6\textwidth}
+    ```{r, eval=TRUE, echo=FALSE}
+        ggplot(iris) +
+        geom_point(aes(x=Sepal.Length, y=Petal.Length, col=Species), size=6) +
+        labs(x="Sepal length (cm)", y="Petal length (cm)", title="Iris flowers") +
+        theme(plot.title=element_text(size=50),
+              axis.title.x=element_text(size=40, vjust=-1),
+              axis.title.y=element_text(size=40, vjust=1),
+              axis.text.x=element_text(size=30),
+              axis.text.y=element_text(size=30),
+              legend.title=element_blank(),
+        	  legend.position = "top",
+              legend.text=element_text(size=30),
+              plot.margin = unit(c(1,1,1,1), "cm"))
+    ``` 
+    \endcol
+\endcols
+
+## Example
+
+But it will be such a pain to write such a long code for each one of my plots...
+
+\alert{Fear not!}
+
+### {}
+```
+myTheme <- theme(plot.title=element_text(size=50),
+              axis.title.x=element_text(size=40, vjust=-1),
+              axis.title.y=element_text(size=40, vjust=1),
+              axis.text.x=element_text(size=30),
+              axis.text.y=element_text(size=30),
+              legend.title=element_blank(),
+           	  legend.position = "top",
+              legend.text=element_text(size=30),
+              plot.margin = unit(c(1,1,1,1), "cm"))
+```
+
+Then all you have to do is add a \alert{`+ myTheme`} at the end of your ggplot.
+
+## Example
+\footnotesize
+\begincols
+    \begincol{0.38\textwidth}
+        ```
+        ggplot(iris) +
+        geom_point(aes(x=Sepal.Length, y=Petal.Length, col=Species), size=6) +
+        labs(x="Sepal length (cm)", y="Petal length (cm)", title="Iris flowers") +
+        myTheme
+        ```
+    \endcol
+    \begincol{0.01\textwidth}
+    \endcol
+    \begincol{0.6\textwidth}
+    ```{r, eval=TRUE, echo=FALSE}
+        ggplot(iris) +
+        geom_point(aes(x=Sepal.Length, y=Petal.Length, col=Species), size=6) +
+        labs(x="Sepal length (cm)", y="Petal length (cm)", title="Iris flowers") +
+        theme(plot.title=element_text(size=50),
+              axis.title.x=element_text(size=40, vjust=-1),
+              axis.title.y=element_text(size=40, vjust=1),
+              axis.text.x=element_text(size=30),
+              axis.text.y=element_text(size=30),
+              legend.title=element_blank(),
+          	  legend.position = "top",
+              legend.text=element_text(size=30),
+              plot.margin = unit(c(1,1,1,1), "cm"))
+    ``` 
+    \endcol
+\endcols
+
+## Resources
+
+- \href{https://ggplot2.tidyverse.org/}{The Tidyverse official guide}
+
+- \href{https://r4ds.had.co.nz/data-visualisation.html}{R for Data Science, chapter 3}
+
+- \href{http://zevross.com/blog/2014/08/04/beautiful-plotting-in-r-a-ggplot2-cheatsheet-3/}{Detailed "cheat sheet" with many examples}
+
+- \href{http://www.sthda.com/english/wiki/ggplot2-themes-and-background-colors-the-3-elements}{Themes and backgrounds}
+
+- \href{http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/}{Colours (and colourblind-friendly palettes)}
+
+- \href{http://www.cookbook-r.com/Graphs/Legends_(ggplot2)/}{Legends}
+
+- \href{http://www.cookbook-r.com/Graphs/}{"Cookbook" for R - ggplot2}
+
+- \href{https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf}{Summary cheat sheet}
+
+
+<!-- ----------------------------------------------------------------------- -->
+
+# Package 'kableExtra'
+
+## Package 'kableExtra' 
+
+- `kable` is a function from the `knitr` package
+    + simple table generator
+
+- `kableExtra` turns kable objects into fancier tables
+    + exports to HTML and PDF
+    + copy/paste from HTML often works to import tables to MS Word / Excel
+
+- Allows for a "layer" syntax (sort of similar to ggplot)
+
+## Example
+
+First of all, we need a matrix with the data we want to output:
+
+\tiny
+```{r, echo=TRUE}
+    sepalWidthF1 <- data.frame(table(iris$Sepal.Width[iris$Species=="setosa"]))
+    sepalWidthF2 <- data.frame(table(iris$Sepal.Width[iris$Species=="versicolor"]))
+    sepalWidthF3 <- data.frame(table(iris$Sepal.Width[iris$Species=="virginica"]))
+    
+    myTable <- merge(merge(sepalWidthF1, sepalWidthF2, by=1, all=TRUE),
+          sepalWidthF3, by=1, all=TRUE)
+    myTable <- myTable[order(as.numeric(as.character(myTable[,1]))),]
+    myTable <- cbind(c("Sepal Width (cm)", "Setosa", "Versicolor", "Virginica"), t(myTable))
+    
+    myTable[is.na(myTable)] <- " "
+    
+    head(myTable)
+```
+
+## Example
+```{r, echo=TRUE}
+    myKable <- kable(myTable, format="latex", booktabs=TRUE, 
+    				 row.names=FALSE, col.names=NULL)
+    myKable
+```
+
+## Example
+\footnotesize
+```{r, echo=TRUE}
+    theHeader <- c(1, 9, 10, 4)
+    names(theHeader) <- c(" ", "Small", "Medium", "Large")
+    
+    myKable %>%
+        kable_styling(full_width=FALSE, position="center", 
+                      latex_options="scale_down") %>%
+        group_rows("Species", 2, 4, latex_gap_space="1em") %>%
+        add_header_above(theHeader) %>%
+        footnote(general = "Here is a general comment about the table.")
+```
+
+## Resources
+
+I'm sure there must be lots of excellent guides out there, but these are always my go-to places (and it often has the answers):
+
+- \href{https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html}{Create awesome HTML tables with knitr:kable}
+
+- \href{https://haozhu233.github.io/kableExtra/awesome_table_in_pdf.pdf}{Create awesome PDF tables with knitr:kable}
+
+- \href{https://haozhu233.github.io/kableExtra/}{The kableExtra complete documentation}
+
+<!-- ----------------------------------------------------------------------- -->
+
+# Rmarkdown
+
+## Rmarkdown
+
+- Very useful for writing up drafts / reports / etc.
+
+- Allows for code "chunks" to be run straight from \R 
+    + If your data change, all of your figures and tables are automatically updated!
+    
+- Allows for flexible document structure
+    + Tabs, navigation bar, etc.
+
+- This presentation was written using the Rmarkdown/Beamer output!
+    + It requires a bit of $\textrm{\LaTeX}$ knowledge...
+    + ...but there are other interfaces available (e.g., _ioslides_, _slidy_, _xaringan_)
+
+## Example: html document
+
+### Header:
+\footnotesize
+```{r, eval=FALSE, echo=TRUE}
+---
+title: My first Rmd document
+author: My name
+date: "`r format(Sys.time(), '%d %b %Y')`" <- this displays current date
+output: html_document:
+    toc: true     <- four spaces - no tabs!
+    toc_depth: 2
+    number_sections: true
+    theme: united
+    highlight: tango
+    ... 
+---
+```
+
+## Example: html document
+
+### Body:
+\footnotesize
+```{r, eval=FALSE, echo=TRUE}
+After the header, you can just imput normal(ish) text.
+
+- We can make lists by using hyphens
+    + then four spaces to add subitems
+    + like these
+    
+It's possible to make the font _italic_ or **bold** as well.
+
+To change text colour inline, <span style="color:blue"> we need to use the HTML tag "span" </span>.
+
+# It's easy to add section headers
+
+## And subheaders as well {.tabset .tabset-pills}
+
+### We can also make tabs
+
+With something different in each tab
+
+### I'm another tab
+
+And this is my text
+
+```
+
+## Example: html document
+
+### Body:
+\footnotesize
+```{r, eval=FALSE, echo=TRUE}
+## But that's not all!
+
+The really cool thing about Rmarkdown are the code chunks:
+\```{r, echo=TRUE}
+    x <- rnorm(100,0,1)
+    y <- rnorm(100,0,1)
+    plot(x,y)
+\```
+
+```
+
+## Other formats / resources
+
+- \href{https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf}{Rmarkdown cheat sheet}
+
+- \href{https://bookdown.org/yihui/rmarkdown/word-document.html}{MS Word document}
+
+- Rmarkdown also handles PDF outputs in a similar way, however, you probably need some knowledge of $\textrm{\LaTeX}$ to deal with the errors.
+
+- \href{https://slides.yihui.name/xaringan/}{Xaringan - html presentations}
+
+- \href{http://data-analytics.net/cep/Schedule_files/presentations_demo.html}{Slidy - html presentations}
+
+- \href{https://bookdown.org/yihui/rmarkdown/ioslides-presentation.html}{Ioslides - html presentations}
+
+- \href{https://www.dartistics.com/rmarkdown-shiny.html}{Shiny and Rmarkdown - responsive html}
